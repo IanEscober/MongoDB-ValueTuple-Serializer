@@ -9,11 +9,16 @@ namespace MongoDB.Serializer.ValueTuple.Tests.Serializer
     [Collection("Registration collection")]
     public class ValueTupleSerializerSimpleTests
     {
+        private const string NULL_T1 = "{ \"SimpleValueTuple\" : null }";
+        private const string VALUE_T1 = "{ \"SimpleValueTuple\" : [true] }";
+        private const string NULL_TN = "[{ \"_t\" : \"SimpleValueTupleModel\", \"SimpleValueTuple\" : null }, null]";
+        private const string VALUE_TN = "[{ \"_t\" : \"SimpleValueTupleModel\", \"SimpleValueTuple\" : [true] }, true]";
+
         [Fact]
         public void Serialize_should_serialize_null_T1()
         {
-            var value = new SimpleValueTupleModel { SimpleValueTuple = null };
-            var expectedValue = "{ \"SimpleValueTuple\" : null }";
+            var value = CreateT1ValueTuple(null);
+            var expectedValue = NULL_T1;
 
             var result = value.ToJson();
 
@@ -23,10 +28,8 @@ namespace MongoDB.Serializer.ValueTuple.Tests.Serializer
         [Fact]
         public void Serialize_should_serialize_null_Tn()
         {
-            var simpleValueTuple = new SimpleValueTupleModel { SimpleValueTuple = null };
-            bool? nullableBool = null;
-            var value = (simpleValueTuple, nullableBool);
-            var expectedValue = "[{ \"_t\" : \"SimpleValueTupleModel\", \"SimpleValueTuple\" : null }, null]";
+            var value = CreateTnValueTuple(null);
+            var expectedValue = NULL_TN;
 
             var result = value.ToJson();
 
@@ -36,8 +39,8 @@ namespace MongoDB.Serializer.ValueTuple.Tests.Serializer
         [Fact]
         public void Serialize_should_serialize_value_T1()
         {
-            var value = new SimpleValueTupleModel { SimpleValueTuple = new ValueTuple<bool>(true) };
-            var expectedValue = "{ \"SimpleValueTuple\" : [true] }";
+            var value = CreateT1ValueTuple(true);
+            var expectedValue = VALUE_T1;
 
             var result = value.ToJson();
             
@@ -47,10 +50,8 @@ namespace MongoDB.Serializer.ValueTuple.Tests.Serializer
         [Fact]
         public void Serialize_should_serialize_value_Tn()
         {
-            var simpleValueTuple = new SimpleValueTupleModel { SimpleValueTuple = new ValueTuple<bool>(true) };
-            bool? nullableBool = true;
-            var value = (simpleValueTuple, nullableBool);
-            var expectedValue = "[{ \"_t\" : \"SimpleValueTupleModel\", \"SimpleValueTuple\" : [true] }, true]";
+            var value = CreateTnValueTuple(true);
+            var expectedValue = VALUE_TN;
 
             var result = value.ToJson();
 
@@ -60,8 +61,8 @@ namespace MongoDB.Serializer.ValueTuple.Tests.Serializer
         [Fact]
         public void Deserialize_should_deserialize_null_T1()
         {
-            var value = "{ \"SimpleValueTuple\" : null }";
-            var expectedValue = new SimpleValueTupleModel { SimpleValueTuple = null };
+            var value = NULL_T1;
+            var expectedValue = CreateT1ValueTuple(null);
 
             var result = BsonSerializer.Deserialize<SimpleValueTupleModel>(value);
 
@@ -71,10 +72,8 @@ namespace MongoDB.Serializer.ValueTuple.Tests.Serializer
         [Fact]
         public void Deserialize_should_deserialize_null_Tn()
         {
-            var value = "[{ \"_t\" : \"SimpleValueTupleModel\", \"SimpleValueTuple\" : null }, null]";
-            var simpleValueTuple = new SimpleValueTupleModel { SimpleValueTuple = null };
-            bool? nullableBool = null;
-            var expectedValue = (simpleValueTuple, nullableBool);
+            var value = NULL_TN;
+            var expectedValue = CreateTnValueTuple(null);
 
             var result = BsonSerializer.Deserialize<(SimpleValueTupleModel, bool?)>(value);
 
@@ -84,8 +83,8 @@ namespace MongoDB.Serializer.ValueTuple.Tests.Serializer
         [Fact]
         public void Deserialize_should_deserialize_value_T1()
         {
-            var value = "{ \"SimpleValueTuple\" : [true] }";
-            var expectedValue = new SimpleValueTupleModel { SimpleValueTuple = new ValueTuple<bool>(true) };
+            var value = VALUE_T1;
+            var expectedValue = CreateT1ValueTuple(true);
 
             var result = BsonSerializer.Deserialize<SimpleValueTupleModel>(value);
 
@@ -95,14 +94,32 @@ namespace MongoDB.Serializer.ValueTuple.Tests.Serializer
         [Fact]
         public void Deserialize_should_deserialize_value_Tn()
         {
-            var value = "[{ \"_t\" : \"SimpleValueTupleModel\", \"SimpleValueTuple\" : [true] }, true]";
-            var simpleValueTuple = new SimpleValueTupleModel { SimpleValueTuple = new ValueTuple<bool>(true) };
-            bool? nullableBool = true;
-            var expectedValue = (simpleValueTuple, nullableBool);
+            var value = VALUE_TN;
+            var expectedValue = CreateTnValueTuple(true);
 
             var result = BsonSerializer.Deserialize<(SimpleValueTupleModel, bool?)>(value);
 
             Assert.Equal(expectedValue, result);
+        }
+
+        private SimpleValueTupleModel CreateT1ValueTuple(bool? value)
+        {
+            var simpleValueTuple = new SimpleValueTupleModel { SimpleValueTuple = null };
+            if (value != null)
+            {
+                simpleValueTuple.SimpleValueTuple = new ValueTuple<bool>(value.Value);
+            }
+            return simpleValueTuple;
+        }
+
+        private (SimpleValueTupleModel, bool?) CreateTnValueTuple(bool? value)
+        {
+            var simpleValueTuple = new SimpleValueTupleModel { SimpleValueTuple = null };
+            if (value != null)
+            {
+                simpleValueTuple.SimpleValueTuple = new ValueTuple<bool>(value.Value);
+            }
+            return (simpleValueTuple, value);
         }
     }
 }
