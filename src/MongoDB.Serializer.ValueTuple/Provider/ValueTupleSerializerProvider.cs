@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Collections.Generic;
 using MongoDB.Bson.Serialization;
 using MongoDB.Serializer.ValueTuple.Serializer;
 
@@ -7,21 +8,32 @@ namespace MongoDB.Serializer.ValueTuple.Provider
 {
     public class ValueTupleSerializerProvider : IBsonSerializationProvider
     {
+        private readonly Dictionary<Type,Type> _valueTupleSerializerTypes;
+
+        public ValueTupleSerializerProvider()
+        {
+            _valueTupleSerializerTypes = new Dictionary<Type, Type>
+            {
+                { typeof(ValueTuple<>), typeof(ValueTupleSerializer<>) },
+                { typeof(ValueTuple<,>), typeof(ValueTupleSerializer<,>) },
+                { typeof(ValueTuple<,,>), typeof(ValueTupleSerializer<,,>) },
+                { typeof(ValueTuple<,,,>), typeof(ValueTupleSerializer<,,,>) },
+                { typeof(ValueTuple<,,,,>), typeof(ValueTupleSerializer<,,,,>) },
+                { typeof(ValueTuple<,,,,,>), typeof(ValueTupleSerializer<,,,,,>) },
+                { typeof(ValueTuple<,,,,,,>), typeof(ValueTupleSerializer<,,,,,,>) },
+                { typeof(ValueTuple<,,,,,,,>), typeof(ValueTupleSerializer<,,,,,,,>) },
+            };
+        }
+
         public IBsonSerializer GetSerializer(Type type)
         {
             if (type.IsGenericType && !type.ContainsGenericParameters)
             {
-                var genericType = type.GetGenericTypeDefinition();
+                var genericTypeDefinition = type.GetGenericTypeDefinition();
 
-                if (genericType == typeof(ValueTuple<>))
+                if(_valueTupleSerializerTypes.TryGetValue(genericTypeDefinition, out var genericType))
                 {
-                    var valueTupleSerializer = typeof(ValueTupleSerializer<>).MakeGenericType(type.GenericTypeArguments);
-                    return GetValueTupleSerializer(valueTupleSerializer);
-                }
-                else if (genericType == typeof(ValueTuple<,>))
-                {
-                    var valueTupleSerializer = typeof(ValueTupleSerializer<,>).MakeGenericType(type.GenericTypeArguments);
-                    return GetValueTupleSerializer(valueTupleSerializer);
+                    return GetValueTupleSerializer(genericType.MakeGenericType(type.GenericTypeArguments));
                 }
             }
             return null;
@@ -35,7 +47,7 @@ namespace MongoDB.Serializer.ValueTuple.Provider
             if (valueTupleSerializerConstructor is null)
             {
                 throw new MissingMethodException("No constructor found for ValueTuple serializer");
-            }            
+            }
             return valueTupleSerializerConstructor.Invoke(new object[] { BsonSerializer.SerializerRegistry }) as IBsonSerializer;
         }
     }
