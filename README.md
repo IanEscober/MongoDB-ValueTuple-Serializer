@@ -11,7 +11,7 @@ public class ValueTupleModel
     public (bool MyBool, int MyInt) MyTuple { get; set; } = (true, 1);
 } 
 ```
-```json
+```javascript
 ValueTupleModel: {
     ID: 123,
     MyTuple: [true, 1]
