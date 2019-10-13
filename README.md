@@ -1,4 +1,7 @@
 # MongoDB ValueTuple Serializer
+[![Nuget](https://img.shields.io/nuget/v/MongoDB.Serializer.ValueTuple?color=green&style=plastic)](https://www.nuget.org/packages/MongoDB.Serializer.ValueTuple/)
+[![Nuget](https://img.shields.io/nuget/dt/MongoDB.Serializer.ValueTuple?color=green&style=plastic)](https://www.nuget.org/packages/MongoDB.Serializer.ValueTuple/)
+
 A serializer and deserializer library for the [ValueTuple](https://docs.microsoft.com/en-us/dotnet/api/system.valuetuple?view=netframework-4.8) type introduced in C# 7 for the [MongoDB .NET Driver](https://github.com/mongodb/mongo-csharp-driver). 
 
 ## Format
