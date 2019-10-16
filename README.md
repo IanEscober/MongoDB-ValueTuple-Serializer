@@ -1,4 +1,5 @@
 # MongoDB ValueTuple Serializer
+[![Build status](https://ci.appveyor.com/api/projects/status/09fn35beh5eqk129?svg=true)](https://ci.appveyor.com/project/IanEscober/mongodb-valuetuple-serializer)
 [![Nuget](https://img.shields.io/nuget/v/MongoDB.Serializer.ValueTuple?color=green&style=plastic)](https://www.nuget.org/packages/MongoDB.Serializer.ValueTuple/)
 [![Nuget](https://img.shields.io/nuget/dt/MongoDB.Serializer.ValueTuple?color=green&style=plastic)](https://www.nuget.org/packages/MongoDB.Serializer.ValueTuple/)
 
